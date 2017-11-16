@@ -1,0 +1,7 @@
+<aura:component controller="RestController" implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,force:lightningQuickAction" access="global" >
+    <aura:dependency resource="markup://prao6308:modalContent" type="COMPONENT"/>
+    <aura:handler event="c:closemodal" action="{!c.handleComponentEventFired}"/>
+    <aura:attribute name="overlayPanel" type="Aura.Component[]" />
+    <lightning:overlayLibrary aura:id="overlayLib"/>
+    <lightning:button name="modal" label="Send Email" onclick="{!c.handleShowModal}"/> 
+</aura:component>

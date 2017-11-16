@@ -1,0 +1,21 @@
+<aura:component controller="RestRequestController" implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,force:lightningQuickActionwithoutheader" access="global" > 
+    <aura:attribute name="path" type="String" default="/services/data/v40.0/actions/standard/emailSimple"/>
+    <aura:attribute name="method" type="String" default="POST"/>
+    <aura:attribute name="responseFormat" type="String" default="application/json"/>
+    <aura:attribute name="bodyContent" type="Object" /> 
+    <aura:attribute name="bodyContentType" type="String" default="application/json"/>   
+    <aura:attribute name="emailAddresses" type="String"/>
+    <aura:attribute name="emailSubject" type="String"/>
+    <aura:attribute name="emailBody" type="String" />
+    <aura:attribute name="senderAddress" type="String" />
+    
+    <aura:registerEvent name="restResponseEvent" type="restResponseEvent"/>
+    <aura:registerEvent name="closemodal" type="prao6308:closemodal"/>
+    
+    <lightning:input label="emailAddresses" name="emailAddresses" value="{!v.emailAddresses}" required="true"/>
+    <lightning:input label="emailSubject" name="emailSubject" value="{!v.emailSubject}" required="true"/>
+    <lightning:input label="emailBody" name="emailBody" value="{!v.emailBody}" />
+    <lightning:input label="senderAddress" name="senderAddress" value="{!v.senderAddress}" required="true"/>
+    
+    <lightning:button variant="brand" label="Send Email" onclick="{!c.makeRequest}"/>
+</aura:component>

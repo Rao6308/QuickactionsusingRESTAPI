@@ -1,0 +1,82 @@
+public class RestRequestController {
+    
+    @AuraEnabled
+    public static Response service(
+        String path, 
+        String method, 
+        String responseFormat, 
+        String bodyContent, 
+        String bodyContentType
+    ) {
+        HttpRequest request = buildRequest(path, method, responseFormat, bodyContent, bodyContentType);
+        HttpResponse httpRes = sendRequest(request);
+        Response restRes = buildResponse(httpRes);
+        
+        return restRes;
+    }
+    
+    private static HttpRequest buildRequest(String path, String method, String responseFormat, String bodyContent, String bodyContentType) {
+        HttpRequest request = new HttpRequest();       
+        request.setEndpoint(URL.getSalesforceBaseUrl().toExternalForm() + path);
+        request.setMethod(method);
+        
+        if (bodyContent != null) {
+            request.setBody(bodyContent);
+            request.setHeader('Content-Type', bodyContentType); 
+        }
+        
+        request.setHeader('Authorization', 'Bearer ' + getSessionId());
+        request.setHeader('ACCEPT', responseFormat);
+        
+        return request;
+    }
+    
+    private static HttpResponse sendRequest(HttpRequest request) { 
+        return new Http().send(request);
+    }
+    
+    private static Response buildResponse(HttpResponse httpRes) {
+        
+        Response restRes = new Response();
+        
+        restRes.status = httpRes.getStatus();
+        restRes.statusCode = httpRes.getStatusCode();
+        restRes.body = httpRes.getBody();
+        return restRes;
+    }
+    
+    public static string getsessionId(){
+        configforlightningrestapi__c customval = configforlightningrestapi__c.getValues('config1');
+        String username = customval.username__c;
+        String password = customval.password__c;
+        String clientId = customval.clientId__c;
+        String clientSecret = customval.clientSecret__c;
+        String reqbody = 'grant_type=password&client_id='+clientId+'&client_secret='+clientSecret+'&username='+username+'&password='+password;
+        
+        Http h = new Http();
+        HttpRequest req = new HttpRequest();
+        req.setHeader('Content-Type', 'application/x-www-form-urlencoded');
+        req.setBody(reqbody);
+        req.setMethod('POST');
+        req.setEndpoint('https://login.salesforce.com/services/oauth2/token');//Note if my domain is set up use the proper domain name else use login.salesforce.com for prod or developer or test.salesforce.com for sandbox instance
+        
+        HttpResponse res = h.send(req);
+        system.debug('####'+res.getBody());
+        Map<String,object> responseMap =(Map<String,object>)JSON.deserializeUntyped(res.getBody()) ;  
+        String sessionId =  String.valueOf(responseMap.get('access_token'));
+        return sessionId;
+    }
+    public class Response {
+        
+        @AuraEnabled
+        public String status { get; set; }
+        
+        @AuraEnabled
+        public Integer statusCode { get; set; }
+        
+        @AuraEnabled
+        public String body { get; set; }
+    }
+    
+    
+}
